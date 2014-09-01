@@ -12,20 +12,22 @@ app.controller 'AccountsController', ->
   
 app.directive 'withdrawForm', ->
   restrict: 'E'
-  controller: ->
+  controller: ($scope) ->
     @init     = (@account, @holder) ->
     @withdraw = ->
       if @amount
         @holder.balance  += @amount
         @account.balance -= @amount
       delete @amount
+      $scope.withdrawForm.$setPristine()
     this
   controllerAs: 'form'
   templateUrl: 'withdraw-form.html'
 
 app.directive 'depositForm', ->
   restrict: 'E'
-  controller: ->
+  scope: false
+  controller: ($scope) ->
     @deposit   = {accIndex: 0}
     @init      = (@holder, @accounts) ->
     @isNewAcc  = -> @deposit.accIndex is 'new-account'
@@ -38,12 +40,14 @@ app.directive 'depositForm', ->
     @makeDeposit = (account) ->
       @holder.balance -= @deposit.amount
       account.balance += @deposit.amount
-      @deposit = {}
+      @deposit = {accIndex: 0}
 
     @submit = ->
-      account = if @isNewAcc() then @createAcc() else @accounts[@accIndex]
-      console.log account
+      account = if @isNewAcc() then @createAcc() else @accounts[@deposit.accIndex]
       @makeDeposit account
+      $scope.depositForm.$setPristine()
+        
     this
+
   controllerAs: 'formCtrl'
   templateUrl: 'deposit-form.html'

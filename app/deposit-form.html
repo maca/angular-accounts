@@ -4,7 +4,8 @@
   <div class="form-group">
     <label for="deposit_amount">Monto</label> 
     <input required class="form-control" id="deposit_amount"
-                                         ng-model="formCtrl.deposit.amount"to-cents type="number" step="1" min="0"
+                                         ng-model="formCtrl.deposit.amount"
+                                         to-cents type="number" step="1" min="0"
                                          max="{{formCtrl.holder.balance}}" />
   </div>
   
@@ -18,9 +19,9 @@
 
   <div ng-show="formCtrl.isNewAcc()" class="form-group">
     <label for="deposit_new_account_name">Nombre de cuenta</label> 
-    <input required class="form-control" id="deposit_new_account_name"
-                                         ng-disabled="!formCtrl.isNewAcc"
-                                         ng-model="formCtrl.deposit.newAccName" type="text" />
+    <input class="form-control" id="deposit_new_account_name"
+                                ng-required="formCtrl.isNewAcc()"
+                                ng-model="formCtrl.deposit.newAccName" type="text" />
   </div>
 
   <div class="form-group">
