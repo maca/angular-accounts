@@ -1,4 +1,19 @@
-<form name="withdrawForm" ng-init="form.init(account, accounts.holder)" ng-submit="withdrawForm.$valid && form.withdraw()" novalidate>
-  <input required ng-model="form.amount" to-cents type="number" step="1" min="1" max="{{form.account.balance}}"/>
-  <button class="btn btn-main">Retirar</button>
+<form name="withdrawForm" ng-init="formCtrl.init(account, accounts.holder)"
+                          ng-submit="withdrawForm.$valid && formCtrl.withdraw()" novalidate>
+  <modal title='Retiro de cuenta "{{account.name}}"' id="modal-account-{{$index}}-withdraw">
+      
+      <modal-body>
+        <div class="form-group">
+          <label for="acount-{{$index}}-withdraw-amount">Monto</label> 
+          <input required class="form-control" ng-model="formCtrl.amount" id="acount-{{$index}}-withdraw-amount"
+                                               to-cents type="number" step="1" min="1" max="{{formCtrl.account.balance}}"/>
+          <p>de {{formCtrl.account.balance | fromCents | currency}} disponibles</p>
+        </div>
+      </modal-body>
+
+      <div class="modal-footer">
+        <button class="btn btn-main">Retirar</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+      </div>
+  </modal>
 </form>

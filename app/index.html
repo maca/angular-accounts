@@ -7,6 +7,7 @@
   <script src="/vendor/jquery/dist/jquery.min.js"></script>
   <script src="/vendor/angularjs/angular.min.js"></script>
   <script src="/vendor/bootstrap/js/modal.js"></script>
+  <script src="/vendor/bootstrap/js/alert.js"></script>
 
   <script src="/scripts/main.js"></script>
   <script src="/scripts/lib/tabs-directives.js"></script>
@@ -17,28 +18,89 @@
   <link rel="stylesheet" href="/styles/main.css">
 </head>
 
-<body>
-  <tabs>
+<body ng-controller="AccountsController as accounts">
+  <tabs class="container">
     <pane title="Cuentas">
-      <div ng-controller="AccountsController as accounts">
-        <h1>Cuentas</h1>
+      <div>
+        <div class="holder alert alert-success" role="alert" ng-show="accounts.isHolderVisible()">
 
-        <article class="holder" ng-show="accounts.holder">
-          <p>{{accounts.holder.balance | fromCents | currency}} han sido retirados</p>
-          <button class="btn btn-primary" data-toggle="modal" data-target="#modal-deposit">Depositar</button>
+          <div class="holder-deposit" ng-show="accounts.canDeposit()">
+            <span>
+              {{accounts.holder.balance | fromCents | currency}}
+              han sido retirados
+            </span>
+
+            <button class="btn btn-primary btn-sm" data-toggle="modal"
+              data-target="#modal-deposit">
+              Depositar
+            </button>
+          </div>
+
+          <div class="holder-commit"  ng-show="accounts.isReadyToCommit()">
+            <span>
+              La bolsa está vacia, puedes guardar los cambios a tus cuentas.
+            </span>
+
+            <button class="btn btn-primary btn-sm"
+              ng-click="accounts.commit()">
+              Guardar
+            </button>
+          </div>
+          
           <deposit-form></deposit-form>
-        </article>
+        </div>
 
-        <article class="account" ng-repeat="account in accounts.items">
-          <h1>{{account.name}}</h1>
-          <span>{{account.balance | fromCents | currency}}</span>
-          <withdraw-form></withdraw-form>
-        </article>
+        <h2>Cuentas</h2>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Balance</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="account" ng-repeat="account in accounts.items">
+              <td>{{account.name}}</td>
+              <td>{{account.balance | fromCents | currency}}</td>
+              <td>
+                <button class="btn btn-primary btn-sm"
+                  data-toggle="modal" data-target="#modal-account-{{$index}}-withdraw">
+                  Retirar
+                </button>
+                <withdraw-form></withdraw-form>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
       </div>
     </pane>
     
     <pane title="Transacciones">
-      <h1>Trasaciones</h1>
+      <h2>Trasaciones</h2>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Cuenta</th>
+            <th>Monto</th>
+            <th>Balance</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr ng-repeat="transaction in accounts.transactions">
+            <td>{{transaction.account}}</td>
+            <td class="amount-cell" ng-class="{neg: transaction.amount < 0}">{{transaction.amount | fromCents | customCurrency}}</td>
+            <td>{{transaction.balance | fromCents | currency}}</td>
+            <td>{{transaction.time | date:'dd/MM/yyyy HH:mm' }}</td>
+          </tr>
+        <tbody>
+      </table> 
+
     </pane>
   </tabs>
 </body>
