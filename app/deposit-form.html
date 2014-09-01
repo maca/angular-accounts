@@ -1,30 +1,38 @@
-<form name="depositForm" ng-init="formCtrl.init(accounts.holder, accounts.items)"
-                         ng-submit="depositForm.$valid && formCtrl.submit()" novalidate>
+<modal title="Depósito" id="modal-deposit">
+  <form name="depositForm" ng-init="formCtrl.init(accounts.holder, accounts.items)"
+                           ng-submit="depositForm.$valid && formCtrl.submit()" novalidate>
 
-  <div class="form-group">
-    <label for="deposit_amount">Monto</label> 
-    <input required class="form-control" id="deposit_amount"
-                                         ng-model="formCtrl.deposit.amount"
-                                         to-cents type="number" step="1" min="0"
-                                         max="{{formCtrl.holder.balance}}" />
-  </div>
-  
-  <div class="form-group">
-    <label for="deposit_select_account">Cuenta a depositar</label> 
-    <select id="deposit_select_account" class="form-control" required ng-model="formCtrl.deposit.accIndex">
-      <option ng-repeat="account in formCtrl.accounts" value="{{$index}}">{{account.name}}</option>
-      <option value="new-account">Crear cuenta...</option>
-    </select>
-  </div>
 
-  <div ng-show="formCtrl.isNewAcc()" class="form-group">
-    <label for="deposit_new_account_name">Nombre de cuenta</label> 
-    <input class="form-control" id="deposit_new_account_name"
-                                ng-required="formCtrl.isNewAcc()"
-                                ng-model="formCtrl.deposit.newAccName" type="text" />
-  </div>
+    <modal-body>
+      <div class="form-group">
+        <label for="deposit_amount">Monto</label> 
+        <input required class="form-control" id="deposit_amount"
+                                             ng-model="formCtrl.deposit.amount"
+                                             to-cents type="number" step="1" min="1"
+                                             max="{{formCtrl.holder.balance}}" />
+        <p>de {{formCtrl.holder.balance | fromCents | currency}} disponibles</p>
+      </div>
+      
+      <div class="form-group">
+        <label for="deposit_select_account">Cuenta a depositar</label> 
+        <select id="deposit_select_account" class="form-control" required ng-model="formCtrl.deposit.accIndex">
+          <option ng-repeat="account in formCtrl.accounts" value="{{$index}}">
+            {{account.name}} ({{account.balance | fromCents | currency}})
+          </option>
+          <option value="new-account">Crear cuenta...</option>
+        </select>
+      </div>
 
-  <div class="form-group">
-    <button class="btn btn-main">Depositar</button>
-  </div>
-</form>
+      <div ng-show="formCtrl.isNewAcc()" class="form-group">
+        <label for="deposit_new_account_name">Nombre de cuenta</label> 
+        <input class="form-control" id="deposit_new_account_name"
+                                    ng-required="formCtrl.isNewAcc()"
+                                    ng-model="formCtrl.deposit.newAccName" type="text" />
+      </div>
+    </modal-body>
+
+    <modal-footer>
+      <button class="btn btn-main">Depositar</button>
+    </modal-footer>
+  </form>
+</modal>

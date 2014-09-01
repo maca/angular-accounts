@@ -3,31 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <title>Accounts</title>
+
   <script src="/vendor/jquery/dist/jquery.min.js"></script>
   <script src="/vendor/angularjs/angular.min.js"></script>
+  <script src="/vendor/bootstrap/js/modal.js"></script>
+
   <script src="/scripts/main.js"></script>
   <script src="/scripts/lib/tabs-directives.js"></script>
+  <script src="/scripts/lib/modal-directives.js"></script>
   <script src="/scripts/lib/cents-conversion.js"></script>
+
   <link rel="stylesheet" href="/vendor/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="/styles/main.css">
 </head>
 
 <body>
-
   <tabs>
     <pane title="Cuentas">
       <div ng-controller="AccountsController as accounts">
         <h1>Cuentas</h1>
 
+        <article class="holder" ng-show="accounts.holder">
+          <p>{{accounts.holder.balance | fromCents | currency}} han sido retirados</p>
+          <button class="btn btn-primary" data-toggle="modal" data-target="#modal-deposit">Depositar</button>
+          <deposit-form></deposit-form>
+        </article>
+
         <article class="account" ng-repeat="account in accounts.items">
           <h1>{{account.name}}</h1>
           <span>{{account.balance | fromCents | currency}}</span>
           <withdraw-form></withdraw-form>
-        </article>
-
-        <article class="holder" ng-show="accounts.holder">
-          {{accounts.holder.balance | fromCents | currency}}
-          <deposit-form></deposit-form>
         </article>
       </div>
     </pane>

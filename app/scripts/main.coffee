@@ -1,17 +1,21 @@
-app = angular.module 'accounts', ['tabs-directives', 'cents-conversion']
+app = angular.module 'accounts', ['tabs-directives', 'modal-directives', 'cents-conversion']
 
 accounts = [
   {name: 'Corriente',  balance: 1000 * 100}
   {name: 'Ahorros',  balance: 3000 * 100}
 ]
 
-app.controller 'AccountsController', ->
+
+app.controller 'AccountsController', ['$http', ($http)->
   @items  = accounts
   @holder = {balance: 0}
   this
+]
   
+
 app.directive 'withdrawForm', ->
   restrict: 'E'
+  replace: true
   controller: ($scope) ->
     @init     = (@account, @holder) ->
     @withdraw = ->
@@ -24,9 +28,9 @@ app.directive 'withdrawForm', ->
   controllerAs: 'form'
   templateUrl: 'withdraw-form.html'
 
+ 
 app.directive 'depositForm', ->
   restrict: 'E'
-  scope: false
   controller: ($scope) ->
     @deposit   = {accIndex: 0}
     @init      = (@holder, @accounts) ->
@@ -48,6 +52,6 @@ app.directive 'depositForm', ->
       $scope.depositForm.$setPristine()
         
     this
-
   controllerAs: 'formCtrl'
   templateUrl: 'deposit-form.html'
+
