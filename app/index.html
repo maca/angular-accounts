@@ -31,10 +31,10 @@
         <div class="holder alert alert-success" role="alert" ng-show="accounts.isHolderVisible()">
 
           <div class="holder-deposit" ng-show="accounts.canDeposit()">
-            <span>
+            <p>
               {{accounts.holder.balance | fromCents | currency}}
               han sido retirados
-            </span>
+            </p>
 
             <button class="btn btn-primary btn-sm" data-toggle="modal"
               data-target="#modal-deposit">
@@ -43,15 +43,14 @@
           </div>
 
           <div class="holder-commit"  ng-show="accounts.isReadyToCommit()">
+            <p>
+              La bolsa está vacia, guarda los cambios para que se reflejen en transacciones.
+            </p>
+
             <button class="btn btn-primary btn-sm"
               ng-click="accounts.commit()">
               Guardar
             </button>
-
-            <span>
-              La bolsa está vacia, guarda los cambios para que se reflejen en transacciones.
-            </span>
-
           </div>
           <deposit-form></deposit-form>
         </div>

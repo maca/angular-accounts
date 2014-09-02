@@ -36,9 +36,6 @@ app.controller 'AccountsController', ->
     localStorage['transactions'] = JSON.stringify @transactions
     localStorage['accounts']     = JSON.stringify @items
 
-  @transactionHistoryForAccount = (account) ->
-    [trans] for trans in @transactions when trans.account is account
-
   this
   
 
