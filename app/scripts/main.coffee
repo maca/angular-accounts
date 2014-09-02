@@ -31,7 +31,7 @@ app.controller 'AccountsController', ->
 
   @commit = ->
     toCommit = @holder.transactions
-    @transactions.push toCommit.splice(0, toCommit.length)...
+    @transactions = @transactions.concat toCommit.splice(0, toCommit.length)
 
     localStorage['transactions'] = JSON.stringify @transactions
     localStorage['accounts']     = JSON.stringify @items
@@ -96,28 +96,30 @@ app.directive 'depositForm', ->
 
 app.directive 'transactionHistoryGraph', ['$filter', ($filter) ->
   restrict: 'E'
-  scope:
-    id: '@'
   replace: true
-  controller: ->
-    @xFun     = (d) -> Date.parse d['time']
-    @yFun     = (d) -> d['balance']
-    @xTickFmt = (d) -> d3.time.format('%d/%m/%Y %H:%m') new Date(d)
-    @yTickFmt = (d) -> $filter('currency')(d / 100)
+  controller: ($scope) ->
+    @xFun      = (d) -> Date.parse d['time']
+    @yFun      = (d) -> d['balance']
+    @xTickFmt  = (d) -> d3.time.format('%d/%m/%Y %H:%m') new Date(d)
+    @yTickFmt  = (d) -> $filter('currency')(d / 100)
+    @drawGraph = =>
+      account            = $scope.account
+      transactions       = $scope.accounts.transactions
+      $scope.accountName = account.name
+      data = ({time: tr.time, balance: tr.balance} for tr in transactions when tr.account is account.name)
+      nv.addGraph =>
+        chart = nv.models.sparklinePlus().width(600).height(100).x(@xFun).y(@yFun).xTickFormat(@xTickFmt).yTickFormat(@yTickFmt)
+        d3.select("##{@elemId} svg").datum(data).transition().duration(500).call chart
+        nv.utils.windowResize chart.update
+
+    $scope.$watch 'accounts.transactions', @drawGraph
+
     this
 
   link: ($scope, elem, attrs, ctrl) ->
-    account = $scope.$parent.account
-    transactions = $scope.$parent.accounts.transactions
-    $scope.accountName = account.name
-
-    data = ({time: tr.time, balance: tr.balance} for tr in transactions when tr.account is account.name)
-
-    nv.addGraph ->
-      chart = nv.models.sparklinePlus().width(600).height(100).x(ctrl.xFun).y(ctrl.yFun).xTickFormat(ctrl.xTickFmt).yTickFormat(ctrl.yTickFmt)
-      d3.select("#" + attrs.id).append("svg").datum(data).transition().duration(500).call chart
-      nv.utils.windowResize chart.update
+    ctrl.elemId = attrs.id
+    ctrl.drawGraph(attrs.id)
 
   controllerAs: 'graphCtrl'
-  template: '<div><h3>Historial "{{accountName}}"</h3></div>'
+  template: '<div><h3>Historial "{{accountName}}"</h3><svg></svg></div>'
 ]
