@@ -19,6 +19,8 @@
     "gulp-rename": "~1.2.0",
     "gulp-filter": "~0.4.1",
     "gulp-eco-template": "~0.1.0"
+  },
+  "dependencies": {
+    "coffee-script": "~1.8.0"
   }
 }
-
