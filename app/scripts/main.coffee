@@ -1,20 +1,20 @@
 app = angular.module 'accounts', ['tabs-directives', 'modal-directives', 'cents-conversion']
 
+## Retrieve from localstore or use fake data
 accounts =
   if serializedAccounts = localStorage['accounts']
-    console.log serializedAccounts
     JSON.parse serializedAccounts
   else
     [
       {name: 'Corriente',  balance: 1000 * 100}
       {name: 'Ahorros',  balance: 3000 * 100}
     ]
-
 transactions =
   if serializedTransactions = localStorage['transactions']
     JSON.parse serializedTransactions
   else
-    []
+    {account: acc.name, amount: acc.balance, balance: acc.balance, time: new Date} for acc in accounts
+
 
 app.controller 'AccountsController', ->
   @items        = accounts
@@ -35,6 +35,9 @@ app.controller 'AccountsController', ->
 
     localStorage['transactions'] = JSON.stringify @transactions
     localStorage['accounts']     = JSON.stringify @items
+
+  @transactionHistoryForAccount = (account) ->
+    [trans] for trans in @transactions when trans.account is account
 
   this
   
@@ -93,3 +96,31 @@ app.directive 'depositForm', ->
   controllerAs: 'formCtrl'
   templateUrl: 'deposit-form.html'
 
+
+app.directive 'transactionHistoryGraph', ['$filter', ($filter) ->
+  restrict: 'E'
+  scope:
+    id: '@'
+  replace: true
+  controller: ->
+    @xFun     = (d) -> Date.parse d['time']
+    @yFun     = (d) -> d['balance']
+    @xTickFmt = (d) -> d3.time.format('%d/%m/%Y %H:%m') new Date(d)
+    @yTickFmt = (d) -> $filter('currency')(d / 100)
+    this
+
+  link: ($scope, elem, attrs, ctrl) ->
+    account = $scope.$parent.account
+    transactions = $scope.$parent.accounts.transactions
+    $scope.accountName = account.name
+
+    data = ({time: tr.time, balance: tr.balance} for tr in transactions when tr.account is account.name)
+
+    nv.addGraph ->
+      chart = nv.models.sparklinePlus().width(600).height(100).x(ctrl.xFun).y(ctrl.yFun).xTickFormat(ctrl.xTickFmt).yTickFormat(ctrl.yTickFmt)
+      d3.select("#" + attrs.id).append("svg").datum(data).transition().duration(500).call chart
+      nv.utils.windowResize chart.update
+
+  controllerAs: 'graphCtrl'
+  template: '<div><h3>Historial "{{accountName}}"</h3></div>'
+]

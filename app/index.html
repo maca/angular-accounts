@@ -9,6 +9,9 @@
   <script src="/vendor/bootstrap/js/modal.js"></script>
   <script src="/vendor/bootstrap/js/alert.js"></script>
 
+  <script src="/vendor/d3/d3.js"></script>
+  <script src="/vendor/nvd3/nv.d3.js"></script>
+
   <script src="/scripts/main.js"></script>
   <script src="/scripts/lib/tabs-directives.js"></script>
   <script src="/scripts/lib/modal-directives.js"></script>
@@ -16,9 +19,12 @@
 
   <link rel="stylesheet" href="/vendor/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="/vendor/nvd3/nv.d3.css"/>
 </head>
 
 <body ng-controller="AccountsController as accounts">
+  <div id='chart25b417346128' class='rChart nvd3'></div>
+
   <tabs class="container">
     <pane title="Cuentas">
       <div>
@@ -37,16 +43,16 @@
           </div>
 
           <div class="holder-commit"  ng-show="accounts.isReadyToCommit()">
-            <span>
-              La bolsa está vacia, puedes guardar los cambios a tus cuentas.
-            </span>
-
             <button class="btn btn-primary btn-sm"
               ng-click="accounts.commit()">
               Guardar
             </button>
+
+            <span>
+              La bolsa está vacia, guarda los cambios para que se reflejen en transacciones.
+            </span>
+
           </div>
-          
           <deposit-form></deposit-form>
         </div>
 
@@ -56,20 +62,37 @@
           <thead>
             <tr>
               <th>Nombre</th>
-              <th>Balance</th>
-              <th></th>
+              <th colspan="2">Balance</th>
             </tr>
           </thead>
           <tbody>
-            <tr class="account" ng-repeat="account in accounts.items">
+            <tr class="account" ng-repeat-start="account in accounts.items">
               <td>{{account.name}}</td>
               <td>{{account.balance | fromCents | currency}}</td>
-              <td>
+              <td class="text-right">
+                <withdraw-form class="text-left"></withdraw-form>
+
+                <button  class="btn btn-primary btn-sm"
+                  ng-click="showHistory=true" ng-hide="showHistory">
+                  Mostrar historial
+                </button>
+
                 <button class="btn btn-primary btn-sm"
                   data-toggle="modal" data-target="#modal-account-{{$index}}-withdraw">
                   Retirar
                 </button>
-                <withdraw-form></withdraw-form>
+              </td>
+            </tr>
+
+            <tr ng-repeat-end ng-show="showHistory">
+              <td colspan="2">
+                <transaction-history-graph id="graph-{{$index}}"></transaction-history-graph>
+              </td>
+              <td class="text-right">
+                <button class="btn btn-primary btn-sm"
+                  ng-click="showHistory=false">
+                  Ocultar
+                </button>
               </td>
             </tr>
           </tbody>
@@ -77,7 +100,7 @@
 
       </div>
     </pane>
-    
+
     <pane title="Transacciones">
       <h2>Trasaciones</h2>
 
@@ -92,14 +115,14 @@
         </thead>
 
         <tbody>
-          <tr ng-repeat="transaction in accounts.transactions">
+          <tr ng-repeat="transaction in accounts.transactions track by $index">
             <td>{{transaction.account}}</td>
             <td class="amount-cell" ng-class="{neg: transaction.amount < 0}">{{transaction.amount | fromCents | customCurrency}}</td>
             <td>{{transaction.balance | fromCents | currency}}</td>
             <td>{{transaction.time | date:'dd/MM/yyyy HH:mm' }}</td>
           </tr>
         <tbody>
-      </table> 
+      </table>
 
     </pane>
   </tabs>

@@ -1,6 +1,8 @@
 Ejercicio de Angular.js
 =======================
 
+Simulación de manejo de cuentas.
+Las cantidades se manejan internament en centavos.
 
 Para correr clonar repo:
 
@@ -13,11 +15,12 @@ Para correr el servidor de desarrollo:
 
     $ gulp
 
-
-Visitar http://localhost:8080
+Visitar `http://localhost:8080`
 
 
 TODO
+----
 
 - Cerrar forma modal al momento de hacer un retiro
 - Refactorizar para enriquecer modelos POJO
+- En gráfica se corta el texto en hover en primer nodo
